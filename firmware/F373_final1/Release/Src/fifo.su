@@ -1,0 +1,5 @@
+fifo.c:40:6:FIFO_8_init	0	static
+fifo.c:52:9:FIFO_8_put	4	static
+fifo.c:75:9:FIFO_8_get	0	static
+fifo.c:94:10:FIFO_8_get_num_elements	0	static
+fifo.c:98:10:FIFO_8_get_available_space	0	static
