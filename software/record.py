@@ -89,7 +89,7 @@ def main():
             # if we receive no data for a duration longer than <layer_timeout>, we consider that the printing of one layer is finished
             # and we store the data to a file and wait until new data is available which signals the beginning of the next layer
             layer_timeout = 0.01
-            adc_data = ""
+            adc_data = bytearray()
             layer_finished = False
             layer_started = False
             if(verbose == True):
