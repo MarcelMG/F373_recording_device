@@ -126,7 +126,7 @@ def main():
                 print (" time elapsed: %f s" % (t2 -t0)),
                 print (" data rate was %d Bytes/s " % throughPut)
             # open file for writing
-            output_file = open(filename, "w")
+            output_file = open(filename, "wb")
             # write recorded data to file in raw binary format
             output_file.write(adc_data)
             output_file.close()
