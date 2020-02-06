@@ -125,8 +125,10 @@ def main():
                 print("received %d samples, %d bytes" %(len(adc_data)/6, len(adc_data))),
                 print (" time elapsed: %f s" % (t2 -t0)),
                 print (" data rate was %d Bytes/s " % throughPut)
-            # open file for writing
+            # open file for writing in binary mode
             output_file = open(filename, "wb")
+            # write current gain settings to file
+            output_file.write(str(ch_gain[0]) + str(ch_gain[1]) + str(ch_gain[2]) + "\n")
             # write recorded data to file in raw binary format
             output_file.write(adc_data)
             output_file.close()
