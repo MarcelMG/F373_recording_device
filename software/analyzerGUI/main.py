@@ -15,8 +15,11 @@ from scipy.fft import fft
 import natsort
 import glob
 
-debug_mode = True
+debug_mode = False
 
+# supress warnings from matplotlib about Toolbar, see: https://github.com/matplotlib/matplotlib/issues/15284
+import warnings
+warnings.filterwarnings(action="ignore", category=UserWarning)
 # necessary to be able to remove buttons from matplotlib toolbar
 plt.rcParams['toolbar'] = 'toolmanager'
 # dictionary that contains which sensor/spectrum is connected to which ADC channel
@@ -34,7 +37,7 @@ if not debug_mode:
         if event == "OK":
             window.close()
             break
-        elif event == "Cancel":
+        elif event in ["Cancel", None]:
             window.close()
             quit()
         else:
@@ -42,7 +45,7 @@ if not debug_mode:
     # get file paths entered by user
     data_directory = values[0]
     pos_directory = values[1]
-else:
+else: # during development, use fixed paths for quicker testing
     data_directory = "C:/Users/Marcel/OneDrive - student.kit.edu/Python/Versuch_06_02_20/2_Versuch_mit_Pos/optik"
     pos_directory = "C:/Users/Marcel/OneDrive - student.kit.edu/Python/Versuch_06_02_20/2_Versuch_mit_Pos/pos"
 
@@ -97,13 +100,47 @@ while(True):
         if event == "Left" and counter > 0:
             counter -= 1
         elif event == "Right" and counter < max_counter_val:
-            counter +=1
-        # import signal and position data
-        ch1_data, ch2_data, ch3_data, t = import_bin.import_bin(data_files[counter])
-        pos_x, pos_y = import_pos.import_pos(pos_files[counter])
-        pos_x, pos_y = f_theta_lens_correction.apply_correction(pos_x, pos_y)
-        # show file name in GUI
-        window["info_text"].update("Signal data file: "+os.path.basename(data_files[counter])+" ("+str(len(ch1_data))+" samples per channel)\nPosition data file: "+os.path.basename(pos_files[counter])+" ("+str(len(pos_x))+" samples)")
+            counter += 1    
+        # switch between object view (show single data file) and layer view (merge data files of one layer)
+        if values["mergelayer"] == True and int(values["num_obj_per_layer"]) > 1: # layer view, i.e. merge object data
+            # compute which files/objects belong in the current layer
+            file_num_begin = int(counter)*int(values["num_obj_per_layer"])
+            file_num_end = file_num_begin + int(values["num_obj_per_layer"])
+            file_nums = [ x for x in range(file_num_begin, file_num_end) ]
+            if debug_mode:
+                print("files:", end="")
+                print(file_nums)
+                print("layer_num: "+str(counter))
+            # show layer number and files/object numbers of layer in GUI
+            window["info_text"].update("Layer # "+str(int(counter))+"\nfiles "+str(file_num_begin)+"-"+str(file_num_end-1))
+            # import and merge data
+            ch1_data = []
+            ch2_data = []
+            ch3_data = []
+            pos_x = []
+            pos_y = []
+            t = []
+            for i in range(len(file_nums)):
+                # import signal and position data
+                ch1, ch2, ch3, tmp = import_bin.import_bin(data_files[i])
+                x, y = import_pos.import_pos(pos_files[i])
+                x, y = f_theta_lens_correction.apply_correction(x, y)
+                # concatenate data
+                ch1_data += list(ch1)
+                ch2_data += list(ch2)
+                ch3_data += list(ch3)
+                pos_x += list(x)
+                pos_y += list(y)
+            # compute new timescale for concatenated signal
+            t = np.linspace(0, len(ch1_data)/50000.0, len(ch1_data))
+        else: # object view, show only data of one file/object
+            # show file names in GUI
+            window["info_text"].update("Signal data file: "+os.path.basename(data_files[counter])+" ("+str(len(ch1_data))+" samples per channel)\nPosition data file: "+os.path.basename(pos_files[counter])+" ("+str(len(pos_x))+" samples)")
+            # import signal and position data
+            ch1_data, ch2_data, ch3_data, t = import_bin.import_bin(data_files[counter])
+            pos_x, pos_y = import_pos.import_pos(pos_files[counter])
+            pos_x, pos_y = f_theta_lens_correction.apply_correction(pos_x, pos_y)
+        
         # select which channel to plot based on user selection in GUI
         if values["ch1_selection"] == True:
             sig = ch1_data
@@ -149,8 +186,10 @@ while(True):
             plt.axis('square')
             plt.gca().set(xlabel="x-coordinate [mm]", ylabel="y-coordinate [mm]", title="2D position of laser scan")
         elif values["plotheat"] == True:
-            z = signal.resample(sig, len(pos_x))
-            plt.scatter(pos_x, pos_y, c=z, linewidths=0, s=5, cmap=plt.cm.RdBu)
+            # upsample (i.e. interpolate) the position data so we have same number of samples as in signal data
+            pos_x = signal.resample(pos_x, len(sig))
+            pos_y = signal.resample(pos_y, len(sig))
+            plt.scatter(pos_x, pos_y, c=sig, linewidths=0, s=5, cmap=plt.cm.RdBu)
             plt.axis('square')
             plt.gca().set(xlabel="x-coordinate [mm]", ylabel="y-coordinate [mm]", title="2D heatmap of laser scan")
             plt.colorbar(label='photo-current [A]', orientation="vertical", format="%1.2E")
