@@ -18,14 +18,16 @@ lp_input = sg.Input(key="lpfreq", size=(6,1), default_text="100")
 hp_input = sg.Input(key="hpfreq", size=(6,1), default_text="100")
 thresh_btn = sg.Button(button_text="Threshold Signal (binarize)", auto_size_button=True, key="threshold")
 thresh_slider = sg.Slider((0,1), resolution=0.01, orientation="horizontal", key="threshold_val")
+merge_chkbox = sg.Checkbox("Merge all objects of one layer", default=False, key="mergelayer", enable_events=True)
+num_obj_per_layer_input = sg.Input(default_text="1", size=(4,1), key="num_obj_per_layer")
 
 main_window_layout = [ [pltsig_btn, pltfft_btn, plotpos_btn, plotheat_btn],
                        [sg.Canvas(size=(640,480), key='canvas')],
                        [sg.Canvas(key='plot_controls')],
-                       [ch1_btn, sg.Text("", size=(20,1)), lp_chkbox, lp_dropdwn, sg.Text("Order", auto_size_text=True), lp_input, sg.Text("Frequency [Hz]", auto_size_text=True)],
-                       [ch2_btn, sg.Text("", size=(23,1)), hp_chkbox, hp_dropdwn, sg.Text("Order", auto_size_text=True), hp_input, sg.Text("Frequency [Hz]", auto_size_text=True)],
-                       [ch3_btn, sg.Text("", size=(20,1)), thresh_btn, thresh_slider],
-                       [sg.Text(text="", size=(70,2), key="info_text")],
+                       [ch1_btn, sg.Text("", size=(30,1)), lp_chkbox, lp_dropdwn, sg.Text("Order", auto_size_text=True), lp_input, sg.Text("Frequency [Hz]", auto_size_text=True)],
+                       [ch2_btn, sg.Text("", size=(33,1)), hp_chkbox, hp_dropdwn, sg.Text("Order", auto_size_text=True), hp_input, sg.Text("Frequency [Hz]", auto_size_text=True)],
+                       [ch3_btn, sg.Text("", size=(30,1)), thresh_btn, thresh_slider],
+                       [sg.Text(text="", size=(57,2), key="info_text"), merge_chkbox, sg.Text(text="   Number of objects per layer:", justification="left", auto_size_text=True), num_obj_per_layer_input],
                        [left_btn, right_btn] ]
 
 browse_window_layout = [[sg.Text("raw signal data file (*.bin) folder")],
