@@ -85,7 +85,7 @@ fig = plt.gcf()
 screen_w, screen_h = window.GetScreenDimensions()
 fig.set_size_inches(0.75*screen_w/float(fig.get_dpi()), 0.5*screen_h/float(fig.get_dpi()))
 #you have to play with this size (i.e. the 0.74) to reduce the movement error when the mouse hovers over the figure, it's close to canvas size (i.e. 0.75)
-window["canvas"].set_size( (int(0.74*screen_w), int(0.74*screen_h)) )
+window["canvas"].set_size( (int(0.73*screen_w), int(0.73*screen_h)) )
 figure_agg = sgplt.draw_figure_w_toolbar(window['canvas'].TKCanvas, fig, window['plot_controls'].TKCanvas)
 
 ## main infinite loop ##
@@ -189,7 +189,11 @@ while(True):
             # upsample (i.e. interpolate) the position data so we have same number of samples as in signal data
             pos_x = signal.resample(pos_x, len(sig))
             pos_y = signal.resample(pos_y, len(sig))
-            plt.scatter(pos_x, pos_y, c=sig, linewidths=0, s=5, cmap=plt.cm.RdBu)
+            if event=="threshold":
+                colormap = plt.cm.binary
+            else:
+                colormap = plt.cm.RdBu
+            plt.scatter(pos_x, pos_y, c=sig, linewidths=0, s=5, cmap=colormap)
             plt.axis('square')
             plt.gca().set(xlabel="x-coordinate [mm]", ylabel="y-coordinate [mm]", title="2D heatmap of laser scan")
             plt.colorbar(label='photo-current [A]', orientation="vertical", format="%1.2E")
