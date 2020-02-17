@@ -151,7 +151,7 @@ while(True):
         elif values["ch3_selection"] == True:
             sig = ch3_data
             ch_name = channel_spectrum["ch3"]
-        # apply low- or high-pass to signal if selected via GUI
+        # apply notch-, low- or high-pass filterto signal if selected via GUI
         if values["lowpass"] == True:
             fc = float(values["lpfreq"])
             N = int(values["lporder"])
@@ -163,6 +163,13 @@ while(True):
             N = int(values["hporder"])
             fs = 50000.0 # sampling rate of STM32F373 recording device
             sos = signal.butter(N, fc, "hp", fs=fs, output="sos")
+            sig = signal.sosfilt(sos, sig)
+        if values["bandstop"] == True:
+            f1 = float(values["bandstopfreq1"])
+            f2 = float(values["bandstopfreq2"])
+            N = int(values["bandstoporder"])
+            fs = 50000.0 # sampling rate of STM32F373 recording device
+            sos = signal.butter(N, (f1, f2), "bandstop", fs=fs, output="sos")
             sig = signal.sosfilt(sos, sig)
         # binarize signal via threshold if selected via GUI
         if event=="threshold":
