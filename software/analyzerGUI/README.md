@@ -10,3 +10,5 @@ Required modules (use *pip install* to install them):
 * scipy
 * natsort
 * glob
+
+![screenshot](https://github.com/MarcelMG/F373_recording_device/raw/master/software/analyzerGUI/screenshot.jpg)
