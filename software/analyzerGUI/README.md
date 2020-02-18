@@ -3,9 +3,10 @@
 To execute the program, launch the script *main.py*
 
 Required modules (use *pip install* to install them):
-*PySimpleGUI
-*numpy
-*matplotlib
-*scipy
-*natsort
-*glob
+
+* PySimpleGUI
+* numpy
+* matplotlib
+* scipy
+* natsort
+* glob
