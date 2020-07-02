@@ -128,7 +128,7 @@ def main():
             # open file for writing in binary mode
             output_file = open(filename, "wb")
             # write current gain settings to file
-	    gain_setting_str = str(ch_gain[0]) + str(ch_gain[1]) + str(ch_gain[2]) + "\n"
+	    gain_setting_str = str(ch_gain[0]) + str(ch_gain[1]) + str(ch_gain[2])
             output_file.write(gain_setting_str.encode(encoding="ascii"))
             # write recorded data to file in raw binary format
             output_file.write(adc_data)
